@@ -14,54 +14,54 @@ const app = express();
 
 app.set('view engine', 'ejs');
 
-app.use(bodyParser.urlencoded({extended: true}));
+app.use(bodyParser.urlencoded({ extended: true }));
 app.use(express.static("public"));
 
-mongoose.connect("mongodb://localhost:27017/blogDB");
+mongoose.connect("mongodb+srv://glysiaothuru:dailyjournalproject@cluster0.vjd0lqi.mongodb.net/blogDB");
 
 const postSchema = new mongoose.Schema({
   title: String,
   content: String
 });
 
-const Post = mongoose.model("Post",postSchema);
+const Post = mongoose.model("Post", postSchema);
 
 // let posts = [];
 
-app.get("/",(req,res)=>{
+app.get("/", (req, res) => {
   foundPosts();
-  async function foundPosts(){
+  async function foundPosts() {
     const posts = await Post.find();
-    if(posts){
-      res.render("home", {startingContent : homeStartingContent, posts:posts});
+    if (posts) {
+      res.render("home", { startingContent: homeStartingContent, posts: posts });
     }
   }
-  
+
 });
 
-app.get("/about",(req,res)=>{
-  res.render("about", {aboutContent : aboutContent});
+app.get("/about", (req, res) => {
+  res.render("about", { aboutContent: aboutContent });
 });
 
-app.get("/contact",(req,res)=>{
-  res.render("contact", {contactContent : contactContent});
+app.get("/contact", (req, res) => {
+  res.render("contact", { contactContent: contactContent });
 });
 
-app.get("/compose",(req,res)=>{
+app.get("/compose", (req, res) => {
   res.render("compose");
 });
 
-app.post("/compose",(req,res)=>{
+app.post("/compose", (req, res) => {
   const post = new Post({
-    title : req.body.postTitle,
-    content : req.body.postBody
+    title: req.body.postTitle,
+    content: req.body.postBody
   });
   // posts.push(post);
   post.save();
   res.redirect("/");
 });
 
-app.get("/posts/:postId",(req,res)=>{
+app.get("/posts/:postId", (req, res) => {
   const requestedPostId = req.params.postId;
   // posts.forEach(function(post){
   //   const storedTitle = _.lowerCase(post.title);
@@ -70,14 +70,20 @@ app.get("/posts/:postId",(req,res)=>{
   //   };
   // });
   dailyPost();
-  async function dailyPost(){
-    const foundPost = await Post.findOne({_id: requestedPostId});
-    if(foundPost){
-      res.render("post", {title:foundPost.title, content:foundPost.content});
+  async function dailyPost() {
+    const foundPost = await Post.findOne({ _id: requestedPostId });
+    if (foundPost) {
+      res.render("post", { title: foundPost.title, content: foundPost.content });
     }
   }
 });
 
-app.listen(3000, function() {
-  console.log("Server started on port 3000");
+let port = process.env.PORT;
+
+if (port == null || "") {
+  port = 3000;
+}
+
+app.listen(port, function () {
+  console.log(`Server started on port ${port}`);
 });
